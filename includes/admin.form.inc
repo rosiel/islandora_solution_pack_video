@@ -132,38 +132,53 @@ function islandora_video_admin_submit($form, &$form_state) {
  * Form validation ensuring the selected ffmpeg options are available.
  */
 function islandora_video_admin_validate($form, &$form_state) {
-  // Ensure the mp4 audio codec is present if MP4 derivative is enabled.
+  // If MP4 derivative is enabled, ensure that ffmpeg is available
+  // and mp4 audio codec is present.
   if ($form_state['values']['islandora_video_make_mp4_locally'] == TRUE) {
-    // If no value is given, set the form to use and validate the default.
-    $raw_value = $form_state['values']['islandora_video_mp4_audio_codec'];
-    $codec = strtolower(trim($raw_value));
-    if (!$codec) {
-      $codec = 'libfaac';
-    }
-    $form_state['values']['islandora_video_mp4_audio_codec'] = $codec;
-    if (preg_match('/[^0-9a-zA-Z_-]/', $codec) === 1) {
-      form_set_error('islandora_video_mp4_audio_codec', "The value entered for MP4 audio codec contains forbidden characters.");
-      return;
-    }
 
     // Test that FFMPEG path is valid.
-    $ffmpeg = ($form_state['values']['islandora_video_ffmpeg_path'] !== variable_get('islandora_video_ffmpeg_path', 'ffmpeg') ? $form_state['values']['islandora_video_ffmpeg_path'] : variable_get('islandora_video_ffmpeg_path', 'ffmpeg'));
-    if (preg_match('/[^0-9a-zA-Z\\/\\\\_-]/', $ffmpeg) === 1) {
-      form_set_error('islandora_video_ffmpeg_path', "The value entered for FFmpeg path contains forbidden characters.");
-      return;
+    $can_use_ffmpeg = FALSE;
+    $raw_ffmpeg = $form_state['values']['islandora_video_ffmpeg_path'];
+    $ffmpeg = strtolower(trim($raw_ffmpeg));
+    $form_state['values']['islandora_video_ffmpeg_path'] = $ffmpeg;
+    if (!$ffmpeg) {
+      // A blank path is not valid.
+      form_set_error('islandora_video_ffmpeg_path', 'Path to FFmpeg cannot be blank. Enter a full valid path, or `ffmpeg` (if ffmpeg is in the system path), or disable MP4 derivatives.');
     }
-    $command = $ffmpeg . ' -version';
-    exec($command, $output, $ret);
-    if ($ret !== 0) {
-      form_set_error('islandora_video_ffmpeg_path', "FFmpeg was not found. A valid FFmpeg path is required if MP4 derivative generation is enabled.");
+    elseif (preg_match('/[^0-9a-zA-Z:\\/\\\\_-]/', $ffmpeg) === 1) {
+      // TODO: Change that if to test if this is_executable or the string ffmpeg
+      form_set_error('islandora_video_ffmpeg_path', "The value entered for FFmpeg path contains forbidden characters.");
     }
     else {
-      // Test that the specified codec is present.
-      unset($output);
-      $command = $ffmpeg . ' -encoders 2>/dev/null | grep "^ ...... ' . $codec . ' "';
+      $command = $ffmpeg . ' -version';
       exec($command, $output, $ret);
-      if (!$output) {
-        form_set_error('islandora_video_mp4_audio_codec', 'The selected MP4 codec was not found in ffmpeg. Try using aac or enable the desired codec.');
+      if ($ret !== 0) {
+        form_set_error('islandora_video_ffmpeg_path', "FFmpeg was not found. A valid FFmpeg path is required if MP4 derivative generation is enabled.");
+      }
+      else {
+        $can_use_ffmpeg = TRUE;
+      }
+    }
+
+    // Test the value of the codec.
+    $raw_value = $form_state['values']['islandora_video_mp4_audio_codec'];
+    $codec = strtolower(trim($raw_value));
+    $form_state['values']['islandora_video_mp4_audio_codec'] = $codec;
+
+    if (!$codec) {
+      form_set_error('islandora_video_mp4_audio_codec', "Audio codec cannot be blank. Enter a valid codec (aac is usually installed).");
+    }
+    else {
+      if (preg_match('/[^0-9a-zA-Z_-]/', $codec) === 1) {
+        form_set_error('islandora_video_mp4_audio_codec', "The value entered for MP4 audio codec contains forbidden characters.");
+      }
+      elseif ($can_use_ffmpeg) {
+        unset($output);
+        $command = $ffmpeg . ' -encoders 2>/dev/null | grep "^ ...... ' . $codec . ' "';
+        exec($command, $output, $ret);
+        if (!$output) {
+          form_set_error('islandora_video_mp4_audio_codec', 'The selected MP4 codec was not found in ffmpeg. Try using aac or enable the desired codec.');
+        }
       }
     }
   }
