@@ -14,6 +14,7 @@ This module requires the following modules/libraries:
 * [Tuque](https://github.com/islandora/tuque)
 * FFmpeg (if creating derivatives locally) - see below for details.
 * [ffmpeg2theora](http://v2v.cc/~j/ffmpeg2theora/) (if creating OGG derivatives)
+* [Imagemagick](https://www.drupal.org/project/imagemagick) (if resizing TN derivatives)
 
 ### Installing FFmpeg and AAC Encoders
 
@@ -40,7 +41,7 @@ Install as usual, see [this](https://www.drupal.org/docs/7/extend/installing-mod
 
 Configure this module, including which (if any) derivatives to create, and which (if any) viewer to use at Administration » Islandora » Solution Pack Configuration » Video Solution Pack (admin/islandora/solution_pack_config/video).
 
-![Configuration](https://user-images.githubusercontent.com/2738244/40234143-b0c31ea6-5a73-11e8-9e3b-8133917d496c.png)
+![Configuration](https://user-images.githubusercontent.com/1943338/50179834-6e6ad080-02de-11e9-8492-915650503c06.png)
 
 ## Documentation
 

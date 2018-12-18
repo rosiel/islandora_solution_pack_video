@@ -138,15 +138,38 @@ function islandora_video_islandora_sp_videoCModel_islandora_ingest_steps() {
 function islandora_video_islandora_sp_videoCModel_islandora_derivative() {
   $derivatives = array();
   if (variable_get('islandora_video_make_thumbnail_locally', TRUE)) {
-    $derivatives[] = array(
-      'source_dsid' => 'OBJ',
-      'destination_dsid' => 'TN',
-      'weight' => '0',
-      'function' => array(
-        'islandora_video_create_thumbnail',
-      ),
-      'file' => drupal_get_path('module', 'islandora_video') . '/includes/derivatives.inc',
-    );
+    if (variable_get('islandora_video_use_separate_tn_large', FALSE)) {
+      $derivatives[] = array(
+        'source_dsid' => 'OBJ',
+        'destination_dsid' => 'TN_LARGE',
+        'weight' => '0',
+        'function' => array(
+          'islandora_video_create_thumbnail_large',
+        ),
+        'file' => drupal_get_path('module', 'islandora_video') . '/includes/derivatives.inc',
+      );
+      $derivatives[] = array(
+        'source_dsid' => 'TN_LARGE',
+        'destination_dsid' => 'TN',
+        'weight' => '0',
+        'function' => array(
+          'islandora_video_resize_thumbnail',
+        ),
+        'file' => drupal_get_path('module', 'islandora_video') . '/includes/derivatives.inc',
+      );
+    }
+    else {
+      $derivatives[] = array(
+        'source_dsid' => 'OBJ',
+        'destination_dsid' => 'TN',
+        'weight' => '0',
+        'function' => array(
+          'islandora_video_create_thumbnail',
+        ),
+        'file' => drupal_get_path('module', 'islandora_video') . '/includes/derivatives.inc',
+      );
+    }
+
   }
   if (variable_get('islandora_video_make_mp4_locally', TRUE)) {
     $derivatives[] = array(

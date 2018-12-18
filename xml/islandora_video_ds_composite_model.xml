@@ -25,6 +25,11 @@
     <form MIME="application/xml"/>
   </dsTypeModel>
   <dsTypeModel ID="TN" optional="false">
+  <form MIME="image/jpeg"/>
+  <form MIME="image/png"/>
+  <form MIME="image/gif"/>
+</dsTypeModel>
+  <dsTypeModel ID="TN_LARGE" optional="true">
     <form MIME="image/jpeg"/>
     <form MIME="image/png"/>
     <form MIME="image/gif"/>

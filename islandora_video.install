@@ -30,6 +30,8 @@ function islandora_video_uninstall() {
     'islandora_video_mp4_audio_codec',
     'islandora_video_play_obj',
     'islandora_video_max_obj_size',
+    'islandora_video_use_separate_tn_large',
+    'islandora_video_make_thumbnail_locally',
   );
   array_map('variable_del', $variables);
   islandora_install_solution_pack('islandora_video', 'uninstall');

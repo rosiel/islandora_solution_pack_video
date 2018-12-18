@@ -67,6 +67,12 @@ function islandora_video_admin(array $form, array &$form_state) {
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
+  $form['derivatives']['islandora_video_use_separate_tn_large'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use separate TN_LARGE datastream for full-sized video still.'),
+    '#description' => t('With this unchecked (default), the TN datastream will be created as a full-sized video still, and will be used as the placeholder in video players. <br/> With this checked, a TN_LARGE datastream will hold the full-sized placeholder still, while new TN datastreams will be downscaled to be consistent with other Islandora thumbnails. Requires imagemagick.'),
+    '#default_value' => variable_get('islandora_video_use_separate_tn_large', FALSE),
+  );
   // FFMPEG configuration.
   $form['derivatives']['islandora_video_ffmpeg_path'] = array(
     '#type' => 'textfield',
@@ -78,8 +84,8 @@ function islandora_video_admin(array $form, array &$form_state) {
   // TN derivatives.
   $form['derivatives']['islandora_video_make_thumbnail_locally'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Create TN datastream locally'),
-    '#description' => t('If On (default), the Drupal server will use FFmpeg to create a thumbnail screenshot from the video, or fall back to a default thumbnail. If Off, no thumbnail will be created.'),
+    '#title' => t('Create TN datastream(s) locally'),
+    '#description' => t('If On (default), the Drupal server will use FFmpeg to create a thumbnail screenshot from the video, or fall back to a default thumbnail. If Off, no thumbnail will be created. This setting applies both to datastreams TN and TN_LARGE (if enabled above).'),
     '#default_value' => variable_get('islandora_video_make_thumbnail_locally', TRUE),
   );
   // MP4 derivatives.
